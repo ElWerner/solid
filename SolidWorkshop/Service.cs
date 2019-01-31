@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -7,49 +8,39 @@ using System.Threading.Tasks;
 
 namespace SolidWorkshop
 {
-    public class Service
+    public class Service : IService
     {
-        private const string _connectionString = "[connectionString]";
-        protected readonly SqlConnection _sqlConnection;
+        protected readonly IDbConnection _dbConnection;
 
-        public Service()
+        public Service(IDbConnection dbConnection)
         {
-            //_sqlConnection = new SqlConnection(_connectionString);
+            if (dbConnection == null)
+            {
+                throw new ArgumentNullException($"{nameof(dbConnection)} is null.");
+            }
+
+            _dbConnection = dbConnection;
         }
 
-        public Entity Save(Entity entity)
+        public void SaveEntity(IEntity entity)
         {
-            try
+            if(entity == null)
             {
-                for (int i = 0; i < 3; i++)
-                {
-                    try
-                    {
-                        _sqlConnection.Open();
-                        //perform Save
-                        _sqlConnection.Close();
-                        return entity;
-                    }
-                    catch
-                    {
-                        if (i == 2)
-                            throw;
-                    }
-                }
-                throw new Exception("Ex");
+                throw new ArgumentNullException($"{nameof(entity)} is null.");
             }
-            catch (Exception e)
-            {
-                throw e;
-            }
-        }
 
-        public List<Entity> ReadAll()
-        {
-            _sqlConnection.Open();
+            _dbConnection.Open();
             //perform Save
-            _sqlConnection.Close();
-            return new List<Entity>();
+            _dbConnection.Close();
+        }
+
+        public IEnumerable<IEntity> ReadEntities()
+        {
+            _dbConnection.Open();
+            //perform Save
+            _dbConnection.Close();
+
+            return new List<IEntity>();
         }
 
     }
